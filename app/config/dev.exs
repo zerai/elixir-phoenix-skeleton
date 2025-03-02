@@ -4,9 +4,8 @@ import Config
 config :app, App.Repo,
   username: "app",
   password: "!ChangeMe!",
-  hostname: "127.0.0.1",
+  hostname: "database",
   database: "app_dev",
-  port: 5432,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
