@@ -1,0 +1,77 @@
+
+services:
+  app:
+    ports:
+      # HTTP
+      - target: 4000
+        published: ${HTTP_PORT:-4000}
+        protocol: tcp
+      - target: 4000
+        published: ${HTTP_PORT:-4000}
+        protocol: udp
+
+
+  database:
+    environment:
+      # Enable for multiple databases
+      POSTGRES_MULTIPLE_DATABASES: app_dev,app_test
+    volumes:
+      # Enable for multiple databases
+      - ./sys/docker/postgres:/docker-entrypoint-initdb.d
+    ports:
+      - target: 5432
+        published: 5432 
+        protocol: tcp
+      - target: 5432
+        published: 5433
+        protocol: tcp
+
+
+  #########################################################################################################################
+  #########################################################################################################################
+  ##
+  ##   infra services
+  ##
+  #########################################################################################################################
+  #########################################################################################################################
+
+  ######################################################################################################################
+  #
+  #   Messaging & queue - RabbitMq
+  #
+  ######################################################################################################################
+  mbroker:
+    profiles: [ rabbitmq, all ]
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-rabbit-user}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-rabbit-password}
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - target: 5672
+        published: 5672
+        protocol: tcp
+      # HTTP
+      - target: 15672
+        published: ${RABBITMQ_HTTP_PORT:-15672}
+        protocol: tcp
+
+
+  ######################################################################################################################
+  #
+  #   Database UI - PgAdmin
+  #
+  ######################################################################################################################
+  pgadmin:
+    profiles: [ postgres-ui, all ]
+    image: dpage/pgadmin4:latest
+    ports:
+      - "8181:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@example.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - ./sys/docker/pgAdmin/servers.json:/pgadmin4/servers.json
