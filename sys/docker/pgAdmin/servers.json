@@ -1,0 +1,15 @@
+{
+    "Servers": {
+        "1": {
+            "Group": "Servers",
+            "Name": "Database",
+            "Host": "database",
+            "Port": 5432,
+            "MaintenanceDB": "app",
+            "Username": "app",
+            "Password": "!ChangeMe!",
+            "SSLMode": "prefer",
+            "Favorite": true
+            }
+        }
+}
