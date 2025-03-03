@@ -1,0 +1,99 @@
+name: Commit stage
+
+on:
+  workflow_call:
+    # Map the workflow outputs to job outputs
+    inputs:
+      triggering-sha:
+        required: true
+        type: string
+
+defaults:
+  run:
+    shell: bash
+    working-directory: app
+
+env:
+      MIX_ENV: test
+
+jobs:
+  commit-checks:
+    name: Commit checks
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        include:
+          - elixir: 1.18.2
+            otp: 27.2.4
+            lint: true
+      fail-fast: false
+    steps:
+      - name: Checkout on SHA-${{ inputs.triggering-sha }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.triggering-sha }}
+      
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+      
+      - name: Restore deps and _build cache
+        uses: actions/cache@v4
+        with:
+          path: app/_build
+          key: deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}
+
+      - name: Install dependencies
+        run: mix deps.get --only test
+      
+      - name: Compile & lint dependencies
+        run: mix compile --warnings-as-errors
+        #if: ${{ matrix.lint }}
+      
+      - name: Check Formatting
+        run: mix format --check-formatted --dry-run
+
+
+  unit-test:
+    name: Unit test
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        include:
+          - elixir: 1.18.2
+            otp: 27.2.4
+      fail-fast: false
+    steps:
+      - name: Checkout on SHA-${{ inputs.triggering-sha }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.triggering-sha }}
+      
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+      
+      - name: Restore deps and _build cache
+        uses: actions/cache@v4
+        with:
+          path: app/_build
+          key: deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}
+
+      - name: Install dependencies
+        run: mix deps.get --only test
+      
+      - name: Compile & lint dependencies
+        run: mix compile --warnings-as-errors
+      
+      - name: Run unit test
+        run: mix test
