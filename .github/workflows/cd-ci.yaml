@@ -8,3 +8,9 @@ jobs:
     uses: zerai/elixir-phoenix-skeleton/.github/workflows/commit-stage.yaml@main
     with:
       triggering-sha: "${{ github.sha }}"
+
+  acceptance-stage-workflow:
+    name: Acceptance Stage
+    uses: zerai/elixir-phoenix-skeleton/.github/workflows/acceptance-stage.yaml@main
+    with:
+      triggering-sha: "${{ github.sha }}"
