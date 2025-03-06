@@ -3,15 +3,14 @@ services:
   app:
     profiles: [ default, all ]
     build:
-      context: ./app
+      context: .
+      dockerfile: app/Dockerfile
       target: elixir_dev
     depends_on:
       - database
     restart: unless-stopped
     volumes:
       - ./app:/app
-    environment:
-      - MIX_ENV=dev
     ports:
       # HTTPS
       - target: 443
@@ -24,7 +23,6 @@ services:
     extra_hosts:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
-    command: mix phx.server
 
 
 

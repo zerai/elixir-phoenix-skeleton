@@ -29,7 +29,8 @@ RUN apt-get install -y nodejs
 # Dev elixir image
 FROM elixir_base AS elixir_dev
 
-ENV MIX_ENV=dev
+COPY --link --chmod=755 ../sys/docker/app/dev_entrypoint.sh /usr/local/bin/docker-entrypoint
+ENTRYPOINT ["docker-entrypoint"]
 EXPOSE 4000
 EXPOSE 433
 EXPOSE 80
