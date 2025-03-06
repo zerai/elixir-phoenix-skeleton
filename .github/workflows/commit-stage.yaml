@@ -59,6 +59,8 @@ jobs:
       - name: Check Formatting
         run: mix format --check-formatted --dry-run
 
+      - name: Check Sa (credo)
+        run: mix credo
 
   unit-test:
     name: Unit test
