@@ -52,14 +52,21 @@ jobs:
       
       - name: Restore deps and _build cache
         uses: actions/cache@v4
+        id: mix-cache
         with:
-          path: app/_build
+          path: |
+            app/deps
+            app/_build
           key: deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}
 
       - name: Install dependencies
-        run: mix deps.get --only test
+        if: steps.mix-cache.outputs.cache-hit != 'true'
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
       
       - name: Compile & lint dependencies
         run: mix compile --warnings-as-errors
