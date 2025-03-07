@@ -60,6 +60,9 @@ jobs:
           mix deps.get
           mix deps.compile
       
+      - name: Check for unused deps
+        run: mix deps.unlock --check-unused
+      
       - name: Compile & lint dependencies
         run: mix compile --warnings-as-errors
       
