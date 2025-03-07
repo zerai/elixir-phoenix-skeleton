@@ -64,15 +64,23 @@ jobs:
         run: mix deps.unlock --check-unused
       
       - name: Compile & lint dependencies
+        if: always()
         run: mix compile --warnings-as-errors
       
       - name: Dependecies vulnerability audit
+        if: always()
         run: mix deps.audit
+      
+      - name: Check for Hex dependencies that have been marked as retired
+        if: always()
+        run: mix hex.audit
 
       - name: Check Formatting
-        run: mix format --check-formatted --dry-run
+        if: always()
+        run: mix format --check-formatted
 
       - name: Check SA (credo)
+        if: always()
         run: mix credo
 
   unit-test:
