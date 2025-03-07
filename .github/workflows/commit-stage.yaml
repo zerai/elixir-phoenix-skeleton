@@ -61,8 +61,10 @@ jobs:
       
       - name: Compile & lint dependencies
         run: mix compile --warnings-as-errors
-        #if: ${{ matrix.lint }}
       
+      - name: Dependecies vulnerability audit
+        run: mix deps.audit
+
       - name: Check Formatting
         run: mix format --check-formatted --dry-run
 
