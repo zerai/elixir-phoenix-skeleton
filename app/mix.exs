@@ -9,7 +9,17 @@ defmodule App.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        # Put the project-level PLT in the priv/ directory (instead of the default _build/ location)
+        plt_file: {:no_warn, "priv/plts/project.plt"}
+
+        # The above is equivalent to:
+        # plt_local_path: "priv/plts/project.plt"
+
+        # You could also put the core Erlang/Elixir PLT into the priv/ directory like so:
+        # plt_core_path: "priv/plts/core.plt"
+      ]
     ]
   end
 
@@ -59,7 +69,8 @@ defmodule App.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false}
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
     ]
   end
 
