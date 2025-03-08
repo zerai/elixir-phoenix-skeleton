@@ -93,12 +93,12 @@ jobs:
           restore-keys: |
             plt-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-
           path: |
-            priv/plts
+            app/priv/plts
       
       # Create PLTs if no cache was found
       - name: Create PLTs
         if: steps.plt_cache.outputs.cache-hit != 'true'
-        run: mix dialyzer --plt
+        run: MIX_ENV=dev mix dialyzer --plt
       
       # By default, the GitHub Cache action will only save the cache if all steps in the job succeed,
       # so we separate the cache restore and save steps in case running dialyzer fails.
@@ -110,13 +110,13 @@ jobs:
           key: |
             plt-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
           path: |
-            priv/plts
+            app/priv/plts
       
       - name: Run dialyzer
         # Two formats are included for ease of debugging and it is lightly recommended to use both, see https://github.com/jeremyjh/dialyxir/issues/530 for reasoning
         # --format github is helpful to print the warnings in a way that GitHub understands and can place on the /files page of a PR
         # --format dialyxir allows the raw GitHub actions logs to be useful because they have the full warning printed
-        run: mix dialyzer --format github --format dialyxir
+        run: MIX_ENV=dev mix dialyzer --format github --format dialyxir
 
 
   unit-test:
